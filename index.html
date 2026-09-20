@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Job Matcher</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Our CSS -->
+    <link rel="stylesheet" href="background.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header class="masthead">
+        <div class="masthead__inner">
+
+            <h1 class="masthead__title">
+                JOB MATCHER
+            </h1>
+
+            <p class="masthead__sub">
+                Find work that matches what you know.
+            </p>
+
+        </div>
+    </header>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="layout">
+
+        <!-- =====================
+             LEFT SIDE - INTAKE
+        ====================== -->
+
+        <aside class="intake">
+
+            <div class="intake__tab">
+                CANDIDATE PROFILE
+            </div>
+
+            <div class="intake__body">
+
+                <form id="intake-form">
+
+                    <!-- Experience -->
+
+                    <div class="field">
+
+                        <label for="years-input">
+                            Years of experience
+                        </label>
+
+                        <input
+                            id="years-input"
+                            type="number"
+                            min="0"
+                            max="50"
+                            value="3"
+                        >
+
+                        <p class="field__hint">
+                            Enter your total professional experience.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Location -->
+
+                    <div class="field">
+
+                        <label for="location-input">
+                            Location
+                        </label>
+
+                        <input
+                            id="location-input"
+                            type="text"
+                            placeholder="e.g. Bengaluru"
+                            value="Remote"
+                        >
+
+                    </div>
+
+
+                    <!-- Remote -->
+
+                    <div class="field field--row">
+
+                        <input
+                            id="remote-only"
+                            type="checkbox"
+                            checked
+                        >
+
+                        <label
+                            class="field__inline-label"
+                            for="remote-only"
+                        >
+                            Remote jobs only
+                        </label>
+
+                    </div>
+
+
+                    <!-- Skills -->
+
+                    <div class="field">
+
+                        <label for="skills-input">
+                            Skills
+                        </label>
+
+                        <div class="chip-input">
+
+                            <div
+                                id="chip-list"
+                                class="chip-list"
+                            ></div>
+
+                            <input
+                                id="skills-input"
+                                type="text"
+                                placeholder="Type a skill and press Enter"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                        <p class="field__hint">
+                            Press Enter or comma after each skill.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Submit -->
+
+                    <button
+                        class="btn-stamp"
+                        type="submit"
+                    >
+                        FIND MATCHES
+                    </button>
+
+                </form>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =====================
+             RIGHT SIDE - RESULTS
+        ====================== -->
+
+        <section class="results">
+
+            <!-- Source tabs -->
+
+            <div
+                id="folder-tabs"
+                class="folder-tabs"
+                role="tablist"
+                aria-label="Job sources"
+            >
+
+                <button
+                    class="folder-tab is-active"
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    data-source="all"
+                >
+                    All
+                </button>
+
+                <button
+                    class="folder-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-source="LinkedIn"
+                >
+                    LinkedIn
+                </button>
+
+                <button
+                    class="folder-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-source="Indeed"
+                >
+                    Indeed
+                </button>
+
+                <button
+                    class="folder-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-source="Greenhouse"
+                >
+                    Greenhouse
+                </button>
+
+                <button
+                    class="folder-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-source="AngelList"
+                >
+                    AngelList
+                </button>
+
+            </div>
+
+
+            <!-- Results information -->
+
+            <div class="results__meta">
+
+                <span id="results-count">
+                    0 listings
+                </span>
+
+                <label
+                    class="sort-label"
+                    for="sort-select"
+                >
+                    Sort:
+                </label>
+
+                <select id="sort-select">
+
+                    <option value="match">
+                        Best match
+                    </option>
+
+                    <option value="date">
+                        Most recent
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Job cards -->
+
+            <div
+                id="job-list"
+                class="job-list"
+            ></div>
+
+
+            <!-- Empty state -->
+
+            <div
+                id="empty-state"
+                class="empty-state"
+                hidden
+            >
+                <h2>No jobs found.</h2>
+
+                <p>
+                    Try changing your filters or candidate profile.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="foot-note">
+
+        <p>
+            Job Matcher is a demonstration project.
+            Job listings shown here are sample data.
+        </p>
+
+    </footer>
+
+
+    <!-- Our JavaScript -->
+    <script src="working.js"></script>
+
+</body>
+</html>
