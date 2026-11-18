@@ -26,16 +26,17 @@ export default {
                 { status: 405, headers: corsHeaders }
             );
         }
-
+ 
         if (!process.env.GEMINI_API_KEY) {
             return Response.json(
                 { error: "Gemini API key is not configured." },
                 { status: 500, headers: corsHeaders }
             );
         }
-
+        let stage = "Reading request body";
         try {
-            const { job, skills } = await request.json();
+            const requestData = await request.json();
+            const { job, skills } = requestData;
 
             if (!job || !skills) {
                 return Response.json(
@@ -43,7 +44,7 @@ export default {
                     { status: 400, headers: corsHeaders }
                 );
             }
-
+            stage = "Calling Gemini API";
             const response = await ai.models.generateContent({
                 model: "gemini-3.5-flash-lite",
                 contents: `
@@ -70,7 +71,7 @@ export default {
             );
 
         } catch (error) {
-            console.error("Gemini API error:", error);
+            console.error(`Gemini API error during: ${stage}`, error);
 
             return Response.json(
                 { error: "Unable to generate the AI explanation." },
