@@ -8,8 +8,19 @@ const ai = new GoogleGenAI({
 export default {
     async fetch(request) {
 
+        // Approved website origins
+        const allowedOrigins = [
+            "https://mohammedaazimzain-max.github.io",
+            "http://127.0.0.1:5500"
+        ];
+
+        const origin = request.headers.get("Origin");
+
         const corsHeaders = {
-            "Access-Control-Allow-Origin": "https://mohammedaazimzain-max.github.io",
+            "Access-Control-Allow-Origin": allowedOrigins.includes(origin)
+                ? origin
+                : "https://mohammedaazimzain-max.github.io",
+            "Vary": "Origin",
             "Access-Control-Allow-Methods": "POST, OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type"
         };
@@ -27,6 +38,14 @@ export default {
             return Response.json(
                 { error: "Method not allowed" },
                 { status: 405, headers: corsHeaders }
+            );
+        }
+
+        // Reject unapproved browser origins
+        if (origin && !allowedOrigins.includes(origin)) {
+            return Response.json(
+                { error: "Origin not allowed." },
+                { status: 403, headers: corsHeaders }
             );
         }
 
@@ -109,8 +128,17 @@ Use exactly this JSON structure:
 
             stage = "Parsing Gemini response";
 
-            // Convert Gemini's JSON response into a JavaScript object
+            // Convert Gemini's JSON response into an object
             const explanation = JSON.parse(response.text);
+
+            // Validate the returned structure
+            if (
+                !Array.isArray(explanation.matchingSkills) ||
+                !Array.isArray(explanation.missingSkills) ||
+                !Array.isArray(explanation.improvementAdvice)
+            ) {
+                throw new Error("Invalid Gemini response structure.");
+            }
 
             // Send structured data to the frontend
             return Response.json(
