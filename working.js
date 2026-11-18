@@ -909,3 +909,97 @@ sortSelect.addEventListener(
 */
 
 render();
+
+/* =========================================
+   GEMINI AI CONNECTION
+========================================= */
+
+jobListEl.addEventListener("click", async function(e) {
+
+    // Check whether the clicked element is our AI button.
+    const button = e.target.closest(".ai-explain-btn");
+
+    // Ignore clicks on anything else.
+    if (!button) {
+        return;
+    }
+
+    // Find the job card containing the button.
+    const card = button.closest(".job-card");
+
+    // Find the explanation area inside that card.
+    const explanation = card.querySelector(".ai-explanation");
+
+    // Find the position of this card in the job list.
+    const cards = Array.from(jobListEl.children);
+    const index = cards.indexOf(card);
+
+    // Get the original job information.
+    const job = JOBS.filter(job =>
+        activeSource === "all" || job.source === activeSource
+    ).filter(job =>
+        !candidate.remoteOnly || job.remote
+    ).sort((a, b) => {
+        if (sortMode === "match") {
+            return computeMatch(b, candidate).percent -
+                   computeMatch(a, candidate).percent;
+        }
+
+        return new Date(b.posted) - new Date(a.posted);
+    })[index];
+
+    if (!job) {
+        return;
+    }
+
+    // Show a loading message.
+    button.disabled = true;
+    button.textContent = "ASKING GEMINI...";
+    explanation.hidden = false;
+    explanation.textContent = "Gemini is analysing your skills...";
+
+    try {
+
+        // Send the job and candidate skills to Vercel.
+        const response = await fetch(
+            "https://api-six-beta-85.vercel.app/api/gemini",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    job: job,
+                    skills: skills
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        // Check whether the API returned an error.
+        if (!response.ok) {
+            throw new Error(data.error || "Gemini request failed.");
+        }
+
+        // Display Gemini's explanation safely.
+        explanation.textContent = data.explanation;
+
+    } catch (error) {
+
+        console.error("Gemini error:", error);
+
+        explanation.textContent =
+            "Sorry! Unable to generate an explanation. " +
+            error.message;
+
+    } finally {
+
+        // Restore the button.
+        button.disabled = false;
+        button.textContent = "ASK GEMINI";
+    }
+
+});
