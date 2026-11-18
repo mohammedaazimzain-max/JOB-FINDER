@@ -1,0 +1,6 @@
+node_modules/
+JOB-FINDER-BACKUP/
+LOCAL-FILES-STAGING/
+.env
+.env.*
+!.env.example
