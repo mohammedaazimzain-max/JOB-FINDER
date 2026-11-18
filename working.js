@@ -658,6 +658,27 @@ function render() {
 
                     </ul>
 
+                                    
+
+                    <!-- AI EXPLANATION BUTTON -->
+
+                    <div class="job-card__ai">
+
+                        <button
+                            class="ai-explain-btn"
+                            type="button"
+                        >
+                            ASK GEMINI
+                        </button>
+
+                        <div
+                            class="ai-explanation"
+                            hidden
+                            aria-live="polite"
+                        ></div>
+
+                    </div>
+
                 </div>
 
 

@@ -749,4 +749,63 @@ body {
         white-space: nowrap;
     }
 
+} 
+/* =========================================
+   GEMINI AI EXPLANATION
+========================================= */
+
+.job-card__ai {
+    margin-top: 1rem;
+}
+
+.ai-explain-btn {
+    padding: 0.65rem 1rem;
+
+    border: 2px solid var(--focus);
+
+    background: transparent;
+
+    color: var(--focus);
+
+    font-family: var(--font-mono);
+
+    font-weight: 700;
+
+    letter-spacing: 0.05em;
+
+    cursor: pointer;
+
+    transition: 0.15s ease;
+}
+
+.ai-explain-btn:hover {
+    background: var(--focus);
+
+    color: white;
+}
+
+.ai-explain-btn:disabled {
+    opacity: 0.6;
+
+    cursor: wait;
+}
+
+.ai-explanation {
+    margin-top: 0.8rem;
+
+    padding: 1rem;
+
+    background: var(--paper-light);
+
+    border: 1px solid var(--rule);
+
+    color: var(--ink);
+
+    white-space: pre-wrap;
+
+    font-size: 0.9rem;
+}
+
+.ai-explanation[hidden] {
+    display: none;
 }
