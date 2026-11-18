@@ -914,23 +914,25 @@ render();
    GEMINI AI CONNECTION
 ========================================= */
 
+
+/* =========================================
+   GEMINI AI CONNECTION
+========================================= */
+
 jobListEl.addEventListener("click", async function(e) {
 
     // Check whether the clicked element is our AI button.
     const button = e.target.closest(".ai-explain-btn");
 
-    // Ignore clicks on anything else.
     if (!button) {
         return;
     }
 
-    // Find the job card containing the button.
+    // Find the job card and explanation area.
     const card = button.closest(".job-card");
-
-    // Find the explanation area inside that card.
     const explanation = card.querySelector(".ai-explanation");
 
-    // Find the position of this card in the job list.
+    // Find the position of this card.
     const cards = Array.from(jobListEl.children);
     const index = cards.indexOf(card);
 
@@ -952,7 +954,7 @@ jobListEl.addEventListener("click", async function(e) {
         return;
     }
 
-    // Show a loading message.
+    // Show loading message.
     button.disabled = true;
     button.textContent = "ASKING GEMINI...";
     explanation.hidden = false;
@@ -960,16 +962,14 @@ jobListEl.addEventListener("click", async function(e) {
 
     try {
 
-        // Send the job and candidate skills to Vercel.
+        // Send job and candidate skills to Vercel.
         const response = await fetch(
             "https://api-six-beta-85.vercel.app/api/gemini",
             {
                 method: "POST",
-
                 headers: {
                     "Content-Type": "application/json"
                 },
-
                 body: JSON.stringify({
                     job: job,
                     skills: skills
@@ -979,13 +979,152 @@ jobListEl.addEventListener("click", async function(e) {
 
         const data = await response.json();
 
-        // Check whether the API returned an error.
         if (!response.ok) {
             throw new Error(data.error || "Gemini request failed.");
         }
 
-        // Display Gemini's explanation safely.
-        explanation.textContent = data.explanation;
+        // Get Gemini's analysis.
+        const analysis = data.explanation;
+
+        const matching = analysis.matchingSkills || [];
+        const missing = analysis.missingSkills || [];
+        const advice = analysis.improvementAdvice || [];
+
+        // Clear previous explanation.
+        explanation.replaceChildren();
+
+        // Helper function for headings.
+        function addHeading(text) {
+            const heading = document.createElement("h3");
+            heading.textContent = text;
+            explanation.appendChild(heading);
+        }
+
+        // =====================================
+        // MATCHING SKILLS
+        // =====================================
+
+        addHeading("Matching Skills");
+
+        const matchingText = document.createElement("p");
+        matchingText.textContent =
+            matching.join(", ") || "None identified";
+
+        explanation.appendChild(matchingText);
+
+        // =====================================
+        // MISSING SKILLS
+        // =====================================
+
+        addHeading("Missing Skills");
+
+        const missingList = document.createElement("ul");
+
+        missing.forEach(skill => {
+            const item = document.createElement("li");
+            item.textContent = skill;
+            missingList.appendChild(item);
+        });
+
+        explanation.appendChild(missingList);
+
+        // =====================================
+        // IMPROVE YOUR SKILLS
+        // =====================================
+
+        addHeading("Improve Your Skills");
+
+        // Create the skill dropdown.
+        const skillDropdown = document.createElement("select");
+        skillDropdown.className = "skill-improvement-dropdown";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Choose a missing skill...";
+
+        skillDropdown.appendChild(defaultOption);
+
+        // Add missing skills.
+        missing.forEach(skill => {
+            const option = document.createElement("option");
+            option.value = skill;
+            option.textContent = skill;
+            skillDropdown.appendChild(option);
+        });
+
+        // Create advice area.
+        const skillAdvice = document.createElement("p");
+        skillAdvice.className = "skill-improvement-advice";
+
+        // =====================================
+        // SEPARATE YOUTUBE VIDEO DROPDOWN
+        // =====================================
+
+        const videoDropdown = document.createElement("details");
+        videoDropdown.className = "video-dropdown";
+        videoDropdown.hidden = true;
+
+        const videoSummary = document.createElement("summary");
+        videoSummary.textContent = "WATCH LEARNING VIDEOS";
+
+        const youtubeLink = document.createElement("a");
+        youtubeLink.target = "_blank";
+        youtubeLink.rel = "noopener noreferrer";
+
+        videoDropdown.appendChild(videoSummary);
+        videoDropdown.appendChild(youtubeLink);
+
+        // =====================================
+        // WHEN A SKILL IS SELECTED
+        // =====================================
+
+        skillDropdown.addEventListener("change", function() {
+
+            const selectedSkill = skillDropdown.value;
+
+            // Close the video dropdown.
+            videoDropdown.open = false;
+
+            // Find improvement advice.
+            const selectedAdvice = advice.find(item =>
+                item.skill.toLowerCase() ===
+                selectedSkill.toLowerCase()
+            );
+
+            skillAdvice.textContent = selectedAdvice
+                ? selectedAdvice.advice
+                : "";
+
+            // No skill selected.
+            if (!selectedSkill) {
+                videoDropdown.hidden = true;
+                youtubeLink.removeAttribute("href");
+                youtubeLink.textContent = "";
+                return;
+            }
+
+            // Create YouTube search link.
+            youtubeLink.href =
+                "https://www.youtube.com/results?search_query=" +
+                encodeURIComponent(
+                    selectedSkill + " tutorial for beginners"
+                );
+
+            youtubeLink.textContent =
+                "Find " + selectedSkill +
+                " tutorials on YouTube";
+
+            // Show the separate video dropdown.
+            videoDropdown.hidden = false;
+        });
+
+        // =====================================
+        // ADD EVERYTHING TO THE PAGE
+        // =====================================
+
+        explanation.appendChild(skillDropdown);
+        explanation.appendChild(skillAdvice);
+        explanation.appendChild(videoDropdown);
 
     } catch (error) {
 
@@ -993,7 +1132,7 @@ jobListEl.addEventListener("click", async function(e) {
 
         explanation.textContent =
             "Sorry! Unable to generate an explanation. " +
-            error.message;
+            (error.message || JSON.stringify(error));
 
     } finally {
 
